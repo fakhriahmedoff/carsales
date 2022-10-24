@@ -168,8 +168,9 @@
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-6">
+                    <div class="col-sm-6 d-flex">
                         <h1>@yield('title')</h1>
+                        <a href="@yield('add_new')" class="ml-2 btn btn-primary">Add new @yield('title')</a>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -180,3 +181,11 @@
                 </div>
             </div>
         </section>
+
+        <div>
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div>{{$error}}</div>
+                @endforeach
+            @endif
+        </div>

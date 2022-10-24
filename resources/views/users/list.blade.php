@@ -1,6 +1,7 @@
 @extends('layout.master')
 
 @section('title','Users')
+@section('add_new',route('admin.users.create'))
 @section('content')
 
     <section class="content">
@@ -24,8 +25,29 @@
                             'data' => ['key' => 'value', 'key' => 'value'] // Array keys are for html <option> tag values, array values are for titles.
                         ]
                         ],
-                        'created_at'
-                    ]
+                        'created_at',
+                        [
+                            'label' => 'Actions', // Optional
+                            'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required
+                            'actionTypes' => [ // Required
+                            'edit' => function ($data) {
+                                return route('admin.users.edit', $data['id']);
+                            },
+                            [
+                                'class' => Itstructure\GridView\Actions\Delete::class, // Required
+                                'url' => function ($data) { // Optional
+                                    return route('admin.users.destroy', $data['id']);
+                                },
+                                'htmlAttributes' => [ // Optional
+                                    'target' => '_blank',
+                                    'style' => 'color: yellow; font-size: 16px;',
+                                    'onclick' => 'return window.confirm("Are you sure you want to delete?");'
+                                ]
+                            ]
+                        ]
+                        ]
+                    ],
+
                 ]) !!}
 
             </div>

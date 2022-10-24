@@ -1,9 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\User\UserSaveRequest;
 use App\Models\User;
+use App\Repositories\RoleRepository;
+use App\Repositories\UserRepository;
+use App\Services\UserService;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\View\Factory;
@@ -12,11 +17,13 @@ use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct(
+        private UserRepository $userRepository,
+        private UserService $userService,
+        private RoleRepository $roleRepository
+    ) {
+    }
+
     public function index(): Application|Factory|View
     {
         $dataProvider = new EloquentDataProvider(User::query());
@@ -26,67 +33,47 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        $edit = false;
+
+        return view('users.form')->with(['edit' => $edit]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function edit(User $user)
     {
-        //
+        $edit  = true;
+        $roles = $this->roleRepository->getAll()->pluck('name','id')->toArray();
+
+        return view('users.form')
+            ->with([
+                'edit'  => $edit,
+                'user'  => $user,
+                'roles' => $roles]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function update(UserSaveRequest $request, User $user)
     {
-        //
+        try {
+            $this->userService->updateOrCreate($request, $user);
+
+            return redirect()->route('admin.users.index')->withSuccess('Action done Successfully');
+        } catch (\RuntimeException $exception) {
+
+            return redirect()->back()->withErrors('result', $exception->getMessage());
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
