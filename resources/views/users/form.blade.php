@@ -19,17 +19,17 @@ $method = $edit ? 'PUT' : 'POST';
                         @method($method)
 
                         <div class="form-group">
-                            {!! FormField::text('name',['value' => $user?->name]) !!}
+                            {!! FormField::text('name',['value' => isset($user) ? $user->name: '']) !!}
                         </div>
                         <div class="form-group">
-                            {!! FormField::text('email',['value' => $user?->email]) !!}
+                            {!! FormField::text('email',['value' => isset($user) ? $user->email : '']) !!}
                         </div>
                         <div class="form-group">
-                            {!! FormField::text('password',['placeholder' => 'leave empty if you dont want update password']) !!}
+                            {!! FormField::text('password',['type' => 'password','required' => !isset($user),'placeholder' => 'leave empty if you dont want update password']) !!}
                         </div>
 
                         <div class="form-group">
-                            {!! FormField::multiSelect('roles', $roles,['value' => $user->roles()->pluck('id')]) !!}
+                            {!! FormField::multiSelect('roles', $roles,['value' => isset($user) ? $user->roles()->pluck('id') : '']) !!}
                         </div>
 
                         <button class="btn btn-primary" type="submit">Save</button>

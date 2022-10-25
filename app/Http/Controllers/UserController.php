@@ -10,7 +10,7 @@ use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
@@ -33,16 +33,24 @@ class UserController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Application|Factory|View
     {
-        $edit = false;
+        $edit  = false;
+        $roles = $this->roleRepository->getAll()->pluck('name', 'id')->toArray();
 
-        return view('users.form')->with(['edit' => $edit]);
+
+        return view('users.form')->with(['edit' => $edit, 'roles' => $roles]);
     }
 
-    public function store(Request $request)
+    public function store(UserSaveRequest $request)
     {
-        //
+        try {
+            $this->userService->updateOrCreate($request, new User());
+
+            return redirect()->route('admin.users.index')->withSuccess('Action done Successfully');
+        } catch (\RuntimeException $exception) {
+            return redirect()->back()->withErrors(['msg' => $exception->getMessage()]);
+        }
     }
 
     public function show($id)
@@ -50,32 +58,38 @@ class UserController extends Controller
         //
     }
 
-    public function edit(User $user)
+    public function edit(User $user): Application|Factory|View
     {
         $edit  = true;
-        $roles = $this->roleRepository->getAll()->pluck('name','id')->toArray();
+        $roles = $this->roleRepository->getAll()->pluck('name', 'id')->toArray();
 
         return view('users.form')
             ->with([
-                'edit'  => $edit,
-                'user'  => $user,
-                'roles' => $roles]);
+                'edit' => $edit,
+                'user' => $user,
+                'roles' => $roles
+            ]);
     }
 
-    public function update(UserSaveRequest $request, User $user)
+    public function update(UserSaveRequest $request, User $user): RedirectResponse
     {
         try {
             $this->userService->updateOrCreate($request, $user);
 
             return redirect()->route('admin.users.index')->withSuccess('Action done Successfully');
         } catch (\RuntimeException $exception) {
-
             return redirect()->back()->withErrors('result', $exception->getMessage());
         }
     }
 
-    public function destroy($id)
+    public function destroy(User $user): RedirectResponse
     {
-        //
+        try {
+            $this->userService->delete($user);
+
+            return redirect()->route('admin.users.index')->withSuccess('Action done Successfully');
+        } catch (\RuntimeException $exception) {
+            return redirect()->back()->withErrors('result', $exception->getMessage());
+        }
     }
 }

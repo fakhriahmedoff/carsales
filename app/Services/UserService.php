@@ -26,7 +26,22 @@ class UserService extends BaseService
             $payload['password'] = $request->get('password');
         }
 
+        if ($request->get('roles'))
+        {
+            $user->roles()->detach();
+
+            foreach($request->get('roles') as $role)
+            {
+                $user->assignRole($role);
+            }
+        }
+
         return $this->userRepository->updateOrCreate($user,$payload);
+    }
+
+    public function delete(User $user)
+    {
+        return $user->delete();
     }
 
 }

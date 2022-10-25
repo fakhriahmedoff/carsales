@@ -16,7 +16,7 @@ class UserSaveRequest extends FormRequest
     {
         return [
             'name'      => 'required|string|max:64',
-            'email'     => 'required|email',
+            'email'     => 'required|email|unique:users,email',
             'password'  => 'nullable|min:4|max:50',
             'roles'     => 'required|array',
         ];

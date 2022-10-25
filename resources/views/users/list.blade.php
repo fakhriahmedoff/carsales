@@ -17,7 +17,7 @@
                         'email',
                         ['label' => 'roles',
                         'value' => function($row){
-                            return $row->roles->first()->name;
+                            return $row->roles?->first()?->name;
                         },
                          'filter' => [
                             'class' => Itstructure\GridView\Filters\DropdownFilter::class,
@@ -39,15 +39,13 @@
                                     return route('admin.users.destroy', $data['id']);
                                 },
                                 'htmlAttributes' => [ // Optional
-                                    'target' => '_blank',
                                     'style' => 'color: yellow; font-size: 16px;',
                                     'onclick' => 'return window.confirm("Are you sure you want to delete?");'
                                 ]
                             ]
-                        ]
+                          ]
                         ]
                     ],
-
                 ]) !!}
 
             </div>
