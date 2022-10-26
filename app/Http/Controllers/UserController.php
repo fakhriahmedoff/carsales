@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Helpers\DataProvider;
 use App\Http\Requests\User\UserSaveRequest;
+use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
+use App\Queries\UsersSearchQuery;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
@@ -24,12 +28,15 @@ class UserController extends Controller
     ) {
     }
 
-    public function index(): Application|Factory|View
+    public function index(Request $request): Application|Factory|View
     {
-        $dataProvider = new EloquentDataProvider(User::query());
+        $query        = new UsersSearchQuery();
+        $dataProvider = new DataProvider($query->search($request->filters));
+        $roles = $this->roleRepository->getAll()->pluck('name', 'id');
 
         return view('users.list', [
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'roles'        => $roles
         ]);
     }
 
@@ -42,10 +49,10 @@ class UserController extends Controller
         return view('users.form')->with(['edit' => $edit, 'roles' => $roles]);
     }
 
-    public function store(UserSaveRequest $request)
+    public function store(UserSaveRequest $request): RedirectResponse
     {
         try {
-            $this->userService->updateOrCreate($request, new User());
+            $this->userService->store($request, new User());
 
             return redirect()->route('admin.users.index')->withSuccess('Action done Successfully');
         } catch (\RuntimeException $exception) {
@@ -71,10 +78,10 @@ class UserController extends Controller
             ]);
     }
 
-    public function update(UserSaveRequest $request, User $user): RedirectResponse
+    public function update(UserUpdateRequest $request, User $user): RedirectResponse
     {
         try {
-            $this->userService->updateOrCreate($request, $user);
+            $this->userService->update($request, $user);
 
             return redirect()->route('admin.users.index')->withSuccess('Action done Successfully');
         } catch (\RuntimeException $exception) {

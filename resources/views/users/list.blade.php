@@ -17,12 +17,12 @@
                         'email',
                         ['label' => 'roles',
                         'value' => function($row){
-                            return $row->roles?->first()?->name;
+                            return '<pre>'.implode(', ',$row->roles->pluck('name')->toArray()).'</pre>';
                         },
                          'filter' => [
                             'class' => Itstructure\GridView\Filters\DropdownFilter::class,
                             'name' => 'role',
-                            'data' => ['key' => 'value', 'key' => 'value'] // Array keys are for html <option> tag values, array values are for titles.
+                            'data' => $roles // Array keys are for html <option> tag values, array values are for titles.
                         ]
                         ],
                         'created_at',
