@@ -28,7 +28,6 @@ class BaseRepository
         return $this->model->paginate($paginate);
     }
 
-
     public function create(array $payload): ?Model
     {
         return $this->model->create($payload);

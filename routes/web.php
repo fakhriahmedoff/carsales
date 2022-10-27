@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,10 +25,7 @@ Route::controller(AuthController::class)->name('admin.')->prefix('admin')->group
 
 Route::name('admin.')->prefix('admin')->middleware('auth')->group(function () {
     Route::get('', [DashboardController::class, 'index'])->name('home');
-    Route::resource('users',\App\Http\Controllers\UserController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('brands', BrandController::class);
 });
 
-
-//Route::get('/', function () {
-//    return view('homepage');
-//});
